@@ -41,6 +41,7 @@ import javax.swing.*;
 import java.io.*;
 import java.net.BindException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -251,6 +252,10 @@ public class PrintSocketServer {
 
     public static int getInsecurePortInUse() {
         return INSECURE_PORTS.get(insecurePortIndex.get());
+    }
+
+    public static boolean isRunningHeadless() {
+        return headless || trayManager.isHeadless();
     }
 
 }

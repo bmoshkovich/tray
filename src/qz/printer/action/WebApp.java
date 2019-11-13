@@ -26,6 +26,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import qz.ws.PrintSocketServer;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -91,6 +92,14 @@ public class WebApp extends Application {
 
             //scale web dimensions down to print dpi
             webView.getTransforms().add(new Scale(WEB_SCALE, WEB_SCALE));
+
+            //resizing webView without showing the stage can result in initial pages printing blank
+            if (PrintSocketServer.isRunningHeadless()) {
+                log.warn("Unable to display stage in headless mode, some pages might be blank");
+            } else {
+                stage.show();
+                stage.toBack();
+            }
 
             snap.playFromStart();
         }
@@ -169,6 +178,8 @@ public class WebApp extends Application {
                 }
 
                 Platform.runLater(() -> {
+                    stage.hide();
+
                     double useScale = 1;
                     for(Transform t : webView.getTransforms()) {
                         if (t instanceof Scale) { useScale *= ((Scale)t).getX(); }
@@ -201,8 +212,10 @@ public class WebApp extends Application {
                     complete.set(true);
                 });
             }
-            catch(Exception e) { thrown.set(e); }
-            finally { stage.hide(); }
+            catch(Exception e) {
+                thrown.set(e);
+                stage.hide();
+            }
         });
 
         Throwable t = null;
@@ -222,11 +235,6 @@ public class WebApp extends Application {
         if (!startup.get()) {
             throw new IOException("JavaFX has not been started");
         }
-
-        Platform.runLater(() -> {
-            stage.show();
-            stage.toBack();
-        });
 
         load(model, (event) -> {
             try {

@@ -512,6 +512,10 @@ public class TrayManager {
         return ports.toString();
     }
 
+    public boolean isHeadless() {
+        return headless;
+    }
+
     /**
      * Thread safe method for setting a fine status message.  Messages are suppressed unless "Show all
      * notifications" is checked.
